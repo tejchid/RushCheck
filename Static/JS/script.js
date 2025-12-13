@@ -1,4 +1,6 @@
+// -------------------------
 // helper
+// -------------------------
 async function postJSON(url, data) {
   const res = await fetch(url, {
     method: "POST",
@@ -8,41 +10,40 @@ async function postJSON(url, data) {
   return res.json();
 }
 
+// -------------------------
+// indicator coloring (main cards)
+// -------------------------
 function colorIndicator(el, level) {
   if (!el) return;
-  const colors = {
-    Low: "#28a745",
-    Medium: "#f6c34a",
-    High: "#dc3545",
-    Default: "#ffffff",
-  };
-  const color = colors[level] || colors.Default;
-  el.style.background = color;
-  el.style.borderColor = color;
+
+  el.classList.remove("status-low", "status-medium", "status-high");
+
+  if (level === "Low") el.classList.add("status-low");
+  else if (level === "Medium") el.classList.add("status-medium");
+  else if (level === "High") el.classList.add("status-high");
 }
 
+// -------------------------
+// modal
+// -------------------------
 function showModal(data) {
-  const title = document.getElementById("modalTitle");
-  const level = document.getElementById("modalLevel");
-  const people = document.getElementById("modalPeople");
-  const capacity = document.getElementById("modalCapacity");
-  const percent = document.getElementById("modalPercent");
   const modal = document.getElementById("modal");
-  if (title) title.textContent = data.location;
-  if (level) level.textContent = data.level;
-  if (people) people.textContent = data.average_people;
-  if (capacity) capacity.textContent = data.capacity;
-  if (percent) percent.textContent = data.percent;
-  if (modal) modal.classList.remove("hidden");
+  if (!modal) return;
+
+  document.getElementById("modalTitle").textContent = data.location;
+  document.getElementById("modalLevel").textContent = data.level;
+  document.getElementById("modalPeople").textContent = data.average_people;
+  document.getElementById("modalCapacity").textContent = data.capacity;
+  document.getElementById("modalPercent").textContent = data.percent;
+
+  modal.classList.remove("hidden");
 
   const directionsBtn = document.getElementById("directionsBtn");
   if (directionsBtn) {
     directionsBtn.onclick = () => {
-      const origin = prompt("Enter your starting location (optional):");
-      let url =
+      const url =
         "https://www.google.com/maps/dir/?api=1&destination=" +
-        encodeURIComponent(data.address || data.location);
-      if (origin) url += "&origin=" + encodeURIComponent(origin);
+        encodeURIComponent(data.location);
       window.open(url, "_blank");
     };
   }
@@ -53,6 +54,47 @@ function hideModal() {
   if (modal) modal.classList.add("hidden");
 }
 
+// -------------------------
+// update sub-location card
+// -------------------------
+function updateSubLocationUI(data) {
+  const id = data.id;
+
+  const peopleEl = document.getElementById(`people-${id}`);
+  const levelEl = document.getElementById(`level-${id}`);
+  const percentEl = document.getElementById(`percent-${id}`);
+  const barEl = document.getElementById(`bar-${id}`);
+  const timeEl = document.getElementById(`time-${id}`);
+
+  if (peopleEl) peopleEl.textContent = data.average_people;
+  if (percentEl) percentEl.textContent = data.percent;
+  if (timeEl) timeEl.textContent = new Date().toLocaleString();
+
+  if (levelEl) {
+    levelEl.textContent = data.level;
+    levelEl.className =
+      data.level === "High"
+        ? "text-red-600 font-semibold"
+        : data.level === "Medium"
+        ? "text-yellow-600 font-semibold"
+        : "text-green-600 font-semibold";
+  }
+
+  if (barEl) {
+    barEl.style.width = data.percent + "%";
+    barEl.className =
+      "h-3 rounded transition-all duration-700 " +
+      (data.level === "High"
+        ? "bg-red-500"
+        : data.level === "Medium"
+        ? "bg-yellow-400"
+        : "bg-green-500");
+  }
+}
+
+// -------------------------
+// DOM READY
+// -------------------------
 document.addEventListener("DOMContentLoaded", () => {
   // hover effect
   document.querySelectorAll(".space-card").forEach((card) => {
@@ -64,56 +106,73 @@ document.addEventListener("DOMContentLoaded", () => {
     );
   });
 
-  // Check (YOLO)
+  // -------------------------
+  // CHECK (YOLO)
+  // -------------------------
   document.querySelectorAll(".check-btn").forEach((btn) => {
     btn.addEventListener("click", async (ev) => {
-      const loc = ev.currentTarget.dataset.loc;
-      const indicator = document.getElementById("indicator-" + loc);
-      const congSpan = document.getElementById("cong-" + loc);
-      const timeSpan = document.getElementById("time-" + loc);
-      ev.currentTarget.disabled = true;
-      ev.currentTarget.textContent = "Checking...";
+      const locId = ev.currentTarget.dataset.loc;
+      const indicator = document.getElementById("indicator-" + locId);
+
+      btn.disabled = true;
+      btn.textContent = "Analyzing...";
 
       try {
-        const json = await postJSON("/api/analyze", { location: loc });
+        const json = await postJSON("/api/analyze", { location: locId });
+
         if (json.error) {
           alert(json.error);
         } else {
           colorIndicator(indicator, json.level);
-          if (congSpan) congSpan.textContent = json.level;
-          if (timeSpan) timeSpan.textContent = new Date().toLocaleString();
+          updateSubLocationUI(json); // 🔥 NEW
           showModal(json);
-          ev.currentTarget.textContent = "Check Again";
+          btn.textContent = "Check Again";
         }
       } catch (err) {
-        alert("Request failed: " + (err.message || err));
-        ev.currentTarget.textContent = "Check";
+        alert("Request failed");
+        btn.textContent = "Check";
       } finally {
-        ev.currentTarget.disabled = false;
+        btn.disabled = false;
       }
     });
   });
 
-  // View previous (from DB)
+  // -------------------------
+  // PREVIOUS (DB)
+  // -------------------------
   document.querySelectorAll(".prev-btn").forEach((btn) => {
     btn.addEventListener("click", async (ev) => {
-      const loc = ev.currentTarget.dataset.loc;
+      const locId = ev.currentTarget.dataset.loc;
+      const indicator = document.getElementById("indicator-" + locId);
+
       try {
-        const json = await postJSON("/api/get_last_status", { location: loc });
-        if (json.error) return alert(json.error);
-        showModal(json);
+        const json = await postJSON("/api/get_last_status", {
+          location: locId,
+        });
+
+        if (json.error) {
+          alert(json.error);
+        } else {
+          colorIndicator(indicator, json.level);
+          updateSubLocationUI(json); // 🔥 NEW
+          showModal(json);
+        }
       } catch (err) {
-        alert("Failed: " + (err.message || err));
+        alert("Failed to load previous data");
       }
     });
   });
 
+  // -------------------------
   // modal handlers
+  // -------------------------
   const modalClose = document.getElementById("modalClose");
   if (modalClose) modalClose.addEventListener("click", hideModal);
+
   const modal = document.getElementById("modal");
-  if (modal)
+  if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) hideModal();
     });
+  }
 });

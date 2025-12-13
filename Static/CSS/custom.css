@@ -663,3 +663,32 @@ header p {
   background: #cbd5e1;
   transform: scale(1.05);
 }
+
+/* ---------- congestion colors ---------- */
+.status-low {
+  background-color: #10b981 !important;
+  border-color: #10b981 !important;
+}
+
+.status-medium {
+  background-color: #f59e0b !important;
+  border-color: #f59e0b !important;
+}
+
+.status-high {
+  background-color: #ef4444 !important;
+  border-color: #ef4444 !important;
+}
+
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 55s linear infinite;
+}

@@ -30,11 +30,14 @@
       <aside class="w-64 bg-white border-r relative z-20">
         <div class="p-4 border-b">
           <div class="flex items-center gap-2">
-            <div
-              class="h-10 w-10 bg-teal-400 rounded flex items-center justify-center font-bold text-white"
-            >
-              R
-            </div>
+            <a href="/" class="flex items-center gap-2">
+              <img
+                src="{{ url_for('static', filename='uploads/images/RushCheckLogo.png') }}"
+                alt="RushCheck Logo"
+                class="h-10 w-10 rounded-full object-cover border border-gray-300 dark:border-gray-600"
+              />
+            </a>
+
             <div>
               <div class="font-bold">RushCheck</div>
               <div class="text-xs text-gray-500">Monitoring Spaces</div>

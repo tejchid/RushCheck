@@ -1,5 +1,7 @@
 {% extends 'layout.html' %} {% block content %}
+
 <div class="max-w-6xl mx-auto">
+  <!-- Header -->
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold">Admin Dashboard</h2>
     <div>
@@ -10,19 +12,13 @@
     </div>
   </div>
 
+  <!-- FORMS -->
   <div class="grid grid-cols-2 gap-6">
-    <!-- Add/Edit Form -->
+    <!-- ADD MAIN LOCATION -->
     <div class="bg-white p-4 rounded shadow">
-      <h3 class="font-semibold mb-3">Add / Edit Location</h3>
+      <h3 class="font-semibold mb-3">Add Main Location</h3>
 
-      <form
-        action="{{ url_for('admin_locations_add') }}"
-        method="post"
-        enctype="multipart/form-data"
-      >
-        <label class="block text-sm">ID (slug)</label>
-        <input name="id" class="w-full border p-2 rounded mb-2" required />
-
+      <form method="POST" action="{{ url_for('admin_add_main_location') }}">
         <label class="block text-sm">Name</label>
         <input name="name" class="w-full border p-2 rounded mb-2" required />
 
@@ -34,62 +30,127 @@
         />
 
         <label class="block text-sm">Address</label>
-        <input name="address" class="w-full border p-2 rounded mb-2" />
+        <input name="address" class="w-full border p-2 rounded mb-4" />
 
-        <label class="block text-sm">Image Upload</label>
-        <input name="image" type="file" accept="image/*" class="w-full mb-2" />
-
-        <label class="block text-sm">Video Upload</label>
-        <input name="video" type="file" accept="video/*" class="w-full mb-4" />
-
-        <button class="bg-teal-600 text-white px-4 py-2 rounded">Save</button>
+        <button class="bg-teal-600 text-white px-4 py-2 rounded">
+          Add Main Location
+        </button>
       </form>
     </div>
 
-    <!-- Existing Locations -->
+    <!-- ADD SUB LOCATION -->
     <div class="bg-white p-4 rounded shadow">
-      <h3 class="font-semibold mb-3">Existing Locations</h3>
+      <h3 class="font-semibold mb-3">Add Sub Location</h3>
 
-      <div class="space-y-2">
-        {% for loc in locations %}
-        <div class="flex justify-between border-b py-2">
-          <div>
-            <div class="font-semibold">{{ loc.name }}</div>
-            <div class="text-xs text-gray-500">ID: {{ loc.id }}</div>
-            <div class="text-xs text-gray-500">
-              <strong>Image:</strong> {{ loc.image }}
-            </div>
-            <div class="text-xs text-gray-500">
-              <strong>Video:</strong> {{ loc.video }}
-            </div>
-          </div>
+      <form
+        method="POST"
+        action="{{ url_for('admin_add_sub_location') }}"
+        enctype="multipart/form-data"
+      >
+        <label class="block text-sm">Parent Location</label>
+        <select
+          name="main_location_id"
+          class="w-full border p-2 rounded mb-2"
+          required
+        >
+          {% for m in main_locations %}
+          <option value="{{ m.id }}">{{ m.name }}</option>
+          {% endfor %}
+        </select>
 
-          <form
-            action="{{ url_for('admin_locations_delete') }}"
-            method="post"
-            onsubmit="return confirm('Delete?')"
-          >
-            <input type="hidden" name="id" value="{{ loc.id }}" />
-            <button class="text-red-600">Delete</button>
-          </form>
-        </div>
-        {% endfor %}
-      </div>
+        <label class="block text-sm">Name</label>
+        <input name="name" class="w-full border p-2 rounded mb-2" required />
 
-      <hr class="my-4" />
+        <label class="block text-sm">Capacity</label>
+        <input
+          name="capacity"
+          type="number"
+          class="w-full border p-2 rounded mb-2"
+        />
 
-      <h3 class="font-semibold mb-2">Recent Checks</h3>
+        <label class="block text-sm">Image</label>
+        <input name="image" type="file" accept="image/*" class="w-full mb-2" />
 
-      <div class="space-y-2 text-sm">
-        {% for s in statuses %}
-        <div class="border-b py-1">
-          <strong>{{ s.location_name }}</strong> — {{ s.level }} ({{
-          s.average_people }} ppl)
-          <div class="text-xs text-gray-500">{{ s.updated_at }}</div>
-        </div>
-        {% endfor %}
-      </div>
+        <label class="block text-sm">Video</label>
+        <input name="video" type="file" accept="video/*" class="w-full mb-4" />
+
+        <button class="bg-blue-600 text-white px-4 py-2 rounded">
+          Add Sub Location
+        </button>
+      </form>
     </div>
   </div>
+
+  <!-- MAIN LOCATIONS (WITH IMAGE UPDATE) -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h3 class="font-semibold mb-3">Main Locations</h3>
+
+    {% for m in main_locations %}
+    <div class="border-b py-4 flex items-center gap-4">
+      <img
+        src="{{ url_for('static', filename=m.image) }}"
+        class="w-20 h-16 object-cover rounded border"
+        onerror="this.src='{{ url_for('static', filename='uploads/images/default.jpg') }}'"
+      />
+
+      <div class="flex-1">
+        <strong>{{ m.name }}</strong>
+        <div class="text-xs text-gray-500">
+          Capacity: {{ m.capacity }} | Address: {{ m.address }}
+        </div>
+      </div>
+
+      <!-- UPDATE IMAGE -->
+      <form
+        method="POST"
+        action="{{ url_for('admin_update_main_location_image') }}"
+        enctype="multipart/form-data"
+        class="flex items-center gap-2"
+      >
+        <input type="hidden" name="location_id" value="{{ m.id }}" />
+        <input
+          type="file"
+          name="image"
+          accept="image/*"
+          class="text-xs w-40"
+          required
+        />
+        <button
+          class="bg-blue-500 text-white px-3 py-1 rounded text-xs whitespace-nowrap"
+        >
+          Update Image
+        </button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- SUB LOCATIONS -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h3 class="font-semibold mb-3">Sub Locations</h3>
+
+    {% for s in locations %}
+    <div class="border-b py-2">
+      <strong>{{ s.name }}</strong>
+      <div class="text-xs text-gray-500">
+        Parent: {{ s.parent_name }} | Capacity: {{ s.capacity }}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- RECENT CHECKS -->
+  <div class="bg-white p-4 rounded shadow mt-6">
+    <h3 class="font-semibold mb-3">Recent Checks</h3>
+
+    {% for s in statuses %}
+    <div class="border-b py-1 text-sm">
+      <strong>{{ s.location_name }}</strong>
+      — {{ s.level }} ({{ s.average_people }} ppl)
+      <div class="text-xs text-gray-500">{{ s.updated_at }}</div>
+    </div>
+    {% endfor %}
+  </div>
 </div>
+
 {% endblock %}

@@ -4,116 +4,97 @@
   <h2 class="text-4xl font-bold mb-8 text-gray-800">Spaces</h2>
 
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-    {% for loc in locations %}
+    {% for loc in main_locations %}
 
     <div
-      class="space-card flex bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition-all"
+      class="space-card flex bg-white rounded-2xl shadow-md border border-gray-200 overflow-hidden transition"
     >
       <!-- Image -->
       <div class="shrink-0">
         <img
           src="{{ url_for('static', filename=loc.image.replace('\\','/')) }}"
-          class="w-56 h-full object-cover thumb"
+          class="w-56 h-full object-cover"
           onerror="this.src='{{ url_for('static', filename='uploads/images/default.jpg') }}'"
+          alt="{{ loc.name }}"
         />
       </div>
 
-      <!-- Right side content -->
+      <!-- Content -->
       <div class="p-6 flex flex-col justify-between flex-1">
-        <!-- Title + Indicator -->
+        <!-- Header -->
         <div class="flex justify-between items-start">
           <div>
-            <h3 class="text-2xl font-semibold text-gray-900">{{ loc.name }}</h3>
-            <p class="text-gray-500 text-base">Capacity: {{ loc.capacity }}</p>
+            <h3 class="text-2xl font-semibold text-blue-600 hover:underline">
+              <a href="{{ url_for('view_sub_locations', location_id=loc.id) }}">
+                {{ loc.name }}
+              </a>
+            </h3>
+
+            <p class="text-gray-500 text-sm">
+              Total Capacity: {{ loc.total_capacity or 0 }}
+            </p>
           </div>
 
-          <div
-            id="indicator-{{ loc.id }}"
-            class="indicator w-7 h-7 rounded-full border-2 border-gray-300 bg-white"
-          ></div>
+          <!-- Congestion Badge -->
+          <span
+            class="px-3 py-1 rounded-full text-sm font-semibold {% if loc.level == 'High' %} bg-red-100 text-red-700 {% elif loc.level == 'Medium' %} bg-yellow-100 text-yellow-700 {% else %} bg-green-100 text-green-700 {% endif %}"
+          >
+            {{ loc.level }}
+          </span>
         </div>
 
-        <!-- Status Info -->
-        <div class="mt-4 text-gray-700 text-base">
-          <strong class="text-gray-900">Congestion:</strong>
-          <span id="cong-{{ loc.id }}">
-            {% if loc.id in statuses %} {{ statuses[loc.id].level }} {% else %}
-            Not checked {% endif %}
+        <!-- Progress Bar -->
+        <div class="mt-6">
+          <div class="h-3 bg-gray-200 rounded overflow-hidden">
+            <div
+              class="h-3 rounded bg-teal-500 transition-all duration-500 ease-out"
+              style="width: {{ loc.percent }}%"
+            ></div>
+          </div>
+
+          <div class="flex justify-between text-xs text-gray-500 mt-1">
+            <span>{{ loc.percent }}% full</span>
+
+            {% if loc.updated_at %}
+            <span>Updated {{ loc.updated_at }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Map Button -->
+        {% if loc.address %}
+        <div class="mt-5">
+          <button
+            aria-label="Get directions to {{ loc.name }}"
+            class="bg-blue-500 hover:bg-blue-600 transition text-white px-4 py-2 rounded text-sm"
+            onclick="window.open(
+              'https://www.google.com/maps/search/?api=1&query={{ loc.address|urlencode }}',
+              '_blank'
+            )"
+          >
+            Get Directions
+          </button>
+        </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-between items-center">
+          <span class="text-sm text-gray-500">
+            {{ loc.total_people or 0 }} people detected
           </span>
 
-          <p class="text-sm text-gray-500 mt-2">
-            Last updated:
-            <span id="time-{{ loc.id }}">
-              {% if loc.id in statuses %} {{ statuses[loc.id].updated_at }} {%
-              else %} - {% endif %}
-            </span>
-          </p>
-        </div>
-
-        <!-- Buttons -->
-        <div class="flex gap-3 mt-6">
-          <!-- Check button -->
-          <button
-            class="check-btn flex-1 py-2 rounded text-white text-base"
-            data-loc="{{ loc.id }}"
+          <a
+            href="{{ url_for('view_sub_locations', location_id=loc.id) }}"
+            class="text-blue-600 text-sm font-medium hover:underline"
           >
-            {% if loc.id in statuses %} Check Again {% else %} Check {% endif %}
-          </button>
-
-          <!-- Previous button -->
-          <button
-            class="prev-btn flex-1 bg-gray-200 text-gray-700 py-2 rounded text-sm"
-            data-loc="{{ loc.id }}"
-          >
-            Previous
-          </button>
-
-          <!-- Directions -->
-          <button
-            class="bg-blue-500 text-white px-4 py-2 rounded text-sm"
-            onclick="window.open('https://www.google.com/maps/search/?api=1&query={{ loc.address|urlencode }}','_blank')"
-          >
-            Map
-          </button>
+            View sections →
+          </a>
         </div>
       </div>
     </div>
 
     {% endfor %}
   </div>
-
-  <!-- Modal -->
-  <div
-    id="modal"
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 hidden"
-  >
-    <div class="modal-content bg-white rounded-lg p-6 w-[450px] relative">
-      <button
-        id="modalClose"
-        class="modal-close absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
-
-      <h3 id="modalTitle" class="text-2xl font-semibold"></h3>
-      <p class="mt-2 text-lg">
-        Congestion Level: <strong id="modalLevel"></strong>
-      </p>
-      <p class="text-lg">Average people: <strong id="modalPeople"></strong></p>
-      <p class="text-lg">Capacity: <strong id="modalCapacity"></strong></p>
-      <p class="text-lg">Percent full: <strong id="modalPercent"></strong>%</p>
-
-      <div class="mt-6 flex justify-end">
-        <button
-          id="directionsBtn"
-          class="bg-teal-500 text-white px-4 py-2 rounded text-base"
-        >
-          Get Directions
-        </button>
-      </div>
-    </div>
-  </div>
 </div>
 
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}

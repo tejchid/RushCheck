@@ -1,69 +1,183 @@
 {% extends 'layout.html' %} {% block content %}
-<div class="max-w-6xl mx-auto">
-  <h1 class="text-4xl font-bold text-teal-500">RushCheck</h1>
-  <p class="mt-2 text-gray-600">
-    Monitor public spaces and quickly check congestion levels.
-  </p>
 
-  <!-- Image gallery -->
-  <div class="mt-8 grid grid-cols-4 gap-4">
-    {% for i in range(4) %}
-    <img
-      src="{{ url_for('static', filename='uploads/images/library.jpg') }}"
-      class="rounded-lg h-40 w-full object-cover"
-      onerror="this.src='{{ url_for('static', filename='uploads/images/default.jpg') }}'"
-    />
-    {% endfor %}
+<div class="max-w-6xl mx-auto">
+  <!-- HERO -->
+  <section class="py-14">
+    <h1 class="text-5xl font-bold text-teal-600">RushCheck</h1>
+    <p class="mt-4 text-xl text-gray-700 max-w-3xl">
+      An AI-powered congestion monitoring platform that helps students quickly
+      find available spaces across campus using real-time computer vision.
+    </p>
+
+    <div class="mt-6 flex gap-4">
+      <a
+        href="{{ url_for('spaces') }}"
+        class="bg-teal-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-teal-700 transition"
+      >
+        View Campus Spaces
+      </a>
+
+      <a
+        href="{{ url_for('help_page') }}"
+        class="bg-gray-100 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition"
+      >
+        Learn How It Works
+      </a>
+    </div>
+  </section>
+
+  <!-- LIVE STATS PREVIEW -->
+  <section class="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-10">
+    <div class="bg-white p-6 rounded-xl shadow text-center">
+      <h3 class="text-3xl font-bold text-teal-600">Real-Time</h3>
+      <p class="text-gray-600 mt-1">AI-powered congestion updates</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow text-center">
+      <h3 class="text-3xl font-bold text-teal-600">Multiple</h3>
+      <p class="text-gray-600 mt-1">Campus buildings & sections</p>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow text-center">
+      <h3 class="text-3xl font-bold text-teal-600">Fast</h3>
+      <p class="text-gray-600 mt-1">Results in under seconds</p>
+    </div>
+  </section>
+
+  <!-- AUTO-SCROLL CAROUSEL -->
+  <div class="mt-14 overflow-hidden relative">
+    <div class="flex gap-4 animate-scroll whitespace-nowrap">
+      {% for img in [ 'uploads/images/sjsuhomepage1.jpg',
+      'uploads/images/sjsuhomepage2.png', 'uploads/images/sjsuhomepage3.jpg',
+      'uploads/images/sjsuhomepage4.png', 'uploads/images/sjsuhomepage1.jpg',
+      'uploads/images/sjsuhomepage2.png' ] %}
+      <img
+        src="{{ url_for('static', filename=img) }}"
+        class="h-48 w-80 object-cover rounded-xl shadow inline-block"
+      />
+      {% endfor %}
+    </div>
   </div>
 
-  <!-- About section -->
-  <div class="mt-12 bg-white rounded-lg p-6 shadow">
-    <div class="grid grid-cols-2 gap-6">
-      <div>
-        <h3 class="text-2xl font-semibold">About us</h3>
-        <p class="mt-2 text-gray-600">
-          RushCheck is a simple app for detecting how busy public spaces are
-          using AI-powered video analysis.
+  <!-- PROBLEM / SOLUTION -->
+  <section class="mt-16 bg-white rounded-xl p-8 shadow">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-4">
+      The Problem We Solve
+    </h2>
+
+    <p class="text-gray-700 leading-relaxed max-w-4xl">
+      Students often waste valuable time walking between buildings trying to
+      find open study spaces, dining areas, or facilities. While existing apps
+      show road traffic, they fail to provide insight into indoor congestion.
+    </p>
+
+    <p class="text-gray-700 leading-relaxed mt-4 max-w-4xl">
+      RushCheck bridges this gap by using AI-powered video analysis to estimate
+      real-time congestion levels inside campus locations — empowering students
+      to make informed decisions before they arrive.
+    </p>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="mt-16">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-6">
+      How RushCheck Works
+    </h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold text-lg mb-2">📹 Computer Vision</h3>
+        <p class="text-gray-600">
+          YOLO-based models analyze video feeds to detect and count people in
+          real-world environments.
         </p>
       </div>
 
-      <div class="flex flex-col gap-4">
-        <a href="/spaces" class="bg-black text-white py-3 rounded text-center"
-          >Public Spaces</a
-        >
-        <a href="/help" class="bg-black text-white py-3 rounded text-center"
-          >How it works?</a
-        >
-        <button class="bg-black text-white py-3 rounded">Security</button>
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold text-lg mb-2">⚙️ Backend Processing</h3>
+        <p class="text-gray-600">
+          A Flask backend processes detection results, calculates congestion
+          metrics, and stores historical data.
+        </p>
+      </div>
+
+      <div class="bg-white p-6 rounded-xl shadow">
+        <h3 class="font-semibold text-lg mb-2">📊 User Interface</h3>
+        <p class="text-gray-600">
+          A responsive interface displays congestion levels, progress bars,
+          historical checks, and building breakdowns.
+        </p>
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Team -->
-  <div class="mt-12">
-    <h3 class="text-2xl font-semibold text-center">Our Team</h3>
-    <div class="mt-6 grid grid-cols-4 gap-6">
-      <div class="text-center">
-        <div class="mx-auto h-24 w-24 rounded-full bg-teal-400"></div>
-        <h4 class="mt-2 font-semibold">Dev 1</h4>
-        <p class="text-sm text-gray-500">Lead</p>
+  <!-- TECH STACK -->
+  <section class="mt-16 bg-white rounded-xl p-8 shadow">
+    <h2 class="text-3xl font-semibold text-gray-800 mb-6">Technology Stack</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+      <div class="bg-gray-100 rounded-lg p-4 text-center">
+        YOLO (Computer Vision)
       </div>
-      <div class="text-center">
-        <div class="mx-auto h-24 w-24 rounded-full bg-teal-400"></div>
-        <h4 class="mt-2 font-semibold">Dev 2</h4>
-        <p class="text-sm text-gray-500">ML</p>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">OpenCV</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">Flask (Backend)</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">SQLite Database</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">HTML / CSS</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">JavaScript</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">Tailwind CSS</div>
+      <div class="bg-gray-100 rounded-lg p-4 text-center">Google Maps API</div>
+    </div>
+  </section>
+
+  <!-- TEAM -->
+  <section class="mt-20">
+    <h2 class="text-3xl font-semibold text-center text-gray-800">Our Team</h2>
+
+    <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+      <div>
+        <div class="mx-auto h-24 w-24 rounded-full bg-teal-500"></div>
+        <h4 class="mt-3 font-semibold">Brandon Rivera</h4>
+        <p class="text-sm text-gray-500">Backend / Systems</p>
       </div>
-      <div class="text-center">
-        <div class="mx-auto h-24 w-24 rounded-full bg-teal-400"></div>
-        <h4 class="mt-2 font-semibold">Dev 3</h4>
+
+      <div>
+        <div class="mx-auto h-24 w-24 rounded-full bg-teal-500"></div>
+        <h4 class="mt-3 font-semibold">Li Wang</h4>
+        <p class="text-sm text-gray-500">Machine Learning</p>
+      </div>
+
+      <div>
+        <div class="mx-auto h-24 w-24 rounded-full bg-teal-500"></div>
+        <h4 class="mt-3 font-semibold">Tejas</h4>
         <p class="text-sm text-gray-500">Frontend</p>
       </div>
-      <div class="text-center">
-        <div class="mx-auto h-24 w-24 rounded-full bg-teal-400"></div>
-        <h4 class="mt-2 font-semibold">Dev 4</h4>
-        <p class="text-sm text-gray-500">UX</p>
+
+      <div>
+        <div class="mx-auto h-24 w-24 rounded-full bg-teal-500"></div>
+        <h4 class="mt-3 font-semibold">Ryan</h4>
+        <p class="text-sm text-gray-500">UX / Design</p>
       </div>
     </div>
-  </div>
+  </section>
+
+  <!-- CTA FOOTER -->
+  <section
+    class="mt-20 mb-16 bg-teal-600 rounded-xl p-10 text-center text-white"
+  >
+    <h2 class="text-3xl font-semibold">
+      Make smarter campus decisions with RushCheck
+    </h2>
+    <p class="mt-3 text-lg opacity-90">
+      Stop guessing. Check congestion before you go.
+    </p>
+
+    <a
+      href="{{ url_for('spaces') }}"
+      class="inline-block mt-6 bg-white text-teal-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+    >
+      Get Started
+    </a>
+  </section>
 </div>
+
 {% endblock %}
