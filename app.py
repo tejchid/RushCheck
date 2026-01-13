@@ -228,7 +228,6 @@ def spaces():
     for r in rows:
         total_capacity = r["total_capacity"] or 0
         total_people = r["total_people"] or 0
-
         percent = (total_people / total_capacity) * 100 if total_capacity else 0
         level = "High" if percent > 60 else "Medium" if percent >= 40 else "Low"
 
@@ -238,7 +237,7 @@ def spaces():
             "level": level
         })
 
-    return jsonify(locations)
+    return jsonify(main_locations=locations)
 
 
 @app.route("/spaces/<int:location_id>")
