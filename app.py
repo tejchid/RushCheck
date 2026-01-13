@@ -22,7 +22,13 @@ os.makedirs(VIDEO_UPLOAD_FOLDER, exist_ok=True)
 ALLOWED_IMAGE_EXT = {"png", "jpg", "jpeg", "gif"}
 ALLOWED_VIDEO_EXT = {"mp4", "mov", "avi", "mkv"}
 
-app = Flask(__name__, static_url_path="/static")
+app = Flask(
+    __name__,
+    template_folder="templates",
+    static_folder="static",
+    static_url_path="/static"
+)
+
 app.secret_key = "dev-secret-change-this"
 
 login_manager = LoginManager(app)
@@ -227,7 +233,7 @@ def spaces():
     locations = []
     for r in rows:
         total_capacity = r["total_capacity"] or 0
-        total_people = r["total_people"] or 0
+        total_people = r["total_people"] or 0   
         percent = (total_people / total_capacity) * 100 if total_capacity else 0
         level = "High" if percent > 60 else "Medium" if percent >= 40 else "Low"
 
