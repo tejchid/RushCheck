@@ -1,8 +1,6 @@
 flask
 flask-login
-werkzeug
+opencv-python-headless
 ultralytics
-opencv-python
 numpy
-pillow
-moviepy
+
