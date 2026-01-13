@@ -7,13 +7,12 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # YOLO detection
 # sys.path.append(os.path.join(os.path.dirname(__file__), "utils"))
 # from detection import average_people_in_video
 
-# BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(__file__)
 DATABASE = os.path.join(BASE_DIR, "data.sqlite")
 
 IMAGE_UPLOAD_FOLDER = os.path.join(BASE_DIR, "static", "uploads", "images")
