@@ -238,7 +238,7 @@ def spaces():
             "level": level
         })
 
-    return jsonify(main_locations=locations)
+    return jsonify(locations)
 
 
 @app.route("/spaces/<int:location_id>")
