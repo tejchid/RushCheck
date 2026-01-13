@@ -205,7 +205,7 @@ def load_user(username):
 # -------------------------
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return redirect(url_for("spaces"))
 
 
 @app.route("/spaces")
