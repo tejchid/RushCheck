@@ -208,6 +208,7 @@ def home():
     return redirect(url_for("spaces"))
 
 
+
 @app.route("/spaces")
 def spaces():
     db = get_db()
