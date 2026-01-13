@@ -237,7 +237,7 @@ def spaces():
             "level": level
         })
 
-    return jsonify(main_locations=locations)
+    return render_template("spaces.html", main_locations=locations)
 
 
 @app.route("/spaces/<int:location_id>")
