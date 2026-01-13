@@ -8,8 +8,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, UserMixin
 
 # YOLO detection
-sys.path.append(os.path.join(os.path.dirname(__file__), "utils"))
-from detection import average_people_in_video
+# sys.path.append(os.path.join(os.path.dirname(__file__), "utils"))
+# from detection import average_people_in_video
 
 BASE_DIR = os.path.dirname(__file__)
 DATABASE = os.path.join(BASE_DIR, "data.sqlite")
@@ -440,46 +440,15 @@ def admin_add_sub_location():
 # -------------------------
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
-    loc_id = request.json.get("location")
-    db = get_db()
-
-    loc = db.execute(
-        "SELECT * FROM sub_locations WHERE id = ?", (loc_id,)
-    ).fetchone()
-
-    if not loc:
-        return jsonify({"error": "Unknown location"}), 400
-
-    video_rel = (loc["video"] or "").replace("\\", "/")
-    if not video_rel:
-        return jsonify({"error": "No video set for this sub-location"}), 400
-
-    video_path = os.path.join(BASE_DIR, "static", *video_rel.split("/"))
-    if not os.path.exists(video_path):
-        return jsonify({"error": f"Video file not found: {video_rel}"}), 404
-
-    avg = average_people_in_video(video_path)
-
-    cap = loc["capacity"] or 0
-    percent = (avg / cap) * 100 if cap else 0
-    level = "High" if percent > 60 else "Medium" if percent >= 40 else "Low"
-
-    db.execute("""
-        INSERT OR REPLACE INTO status
-        (id, location_name, average_people, capacity, percent, level, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
-    """, (loc_id, loc["name"], int(avg), cap, round(percent, 1), level))
-
-    db.commit()
-
     return jsonify({
-        "id": loc_id,
-        "location": loc["name"],
-        "average_people": int(avg),
-        "capacity": cap,
-        "percent": round(percent, 1),
-        "level": level
+        "id": 1,
+        "location": "Demo Location",
+        "average_people": 42,
+        "capacity": 60,
+        "percent": 70.0,
+        "level": "High"
     })
+
 
 
 @app.route("/api/get_last_status", methods=["POST"])
